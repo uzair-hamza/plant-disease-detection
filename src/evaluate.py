@@ -34,6 +34,12 @@ def main() -> None:
     with open(names_path) as f:
         class_names = json.load(f)
 
+    # NOTE: shuffle must stay True (with seed=42) so this is the SAME random
+    # 20% validation split train.py used. With shuffle=False, Keras splits the
+    # alphabetical file list instead, giving a skewed subset (mostly late
+    # alphabet classes) and a misleading accuracy. Predictions and labels are
+    # collected in ONE streaming pass, batch by batch, so they always line up
+    # and memory stays low (no full dataset held in RAM).
     val_ds = keras.utils.image_dataset_from_directory(
         args.data_dir,
         validation_split=0.2,
@@ -41,12 +47,16 @@ def main() -> None:
         seed=42,
         image_size=(args.img_size, args.img_size),
         batch_size=32,
-        shuffle=False,
     )
 
     model = keras.models.load_model(model_path)
-    preds = model.predict(val_ds, verbose=0).argmax(axis=1)
-    y_true = np.concatenate([y.numpy() for _, y in val_ds])
+    pred_list, label_list = [], []
+    for x_batch, y_batch in val_ds:
+        batch_preds = model.predict(x_batch, verbose=0).argmax(axis=1)
+        pred_list.append(batch_preds)
+        label_list.append(y_batch.numpy())
+    preds = np.concatenate(pred_list)
+    y_true = np.concatenate(label_list)
 
     acc = (preds == y_true).mean()
     print(f"Validation accuracy: {acc:.4f} ({acc * 100:.2f}%)\n")
