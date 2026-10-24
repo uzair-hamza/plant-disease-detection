@@ -21,6 +21,18 @@ Kaggle page: https://www.kaggle.com/datasets/maishaidaralkhateeb/plantvillage-da
 
 ### Get the data
 
+Option A — no Kaggle login needed (used for this project):
+
+```bash
+pip install tensorflow-datasets
+python scripts/export_plantvillage.py
+```
+
+This downloads PlantVillage via TensorFlow Datasets and exports it into
+`data/plantvillage/` automatically.
+
+Option B — Kaggle:
+
 1. Download the dataset from the Kaggle link above (you need a free Kaggle
    account) and unzip it.
 2. Put the class folders inside `data/plantvillage/`, so it looks like:
@@ -106,12 +118,36 @@ Prints the predicted disease (or "healthy") and the top-3 probabilities.
 - How a model like this could help farmers: a phone photo → instant
   disease check, before the disease spreads.
 
+## App
+
+```bash
+pip install streamlit
+streamlit run app.py
+```
+
+Opens a web page: upload a leaf photo → the disease name + confidence.
+Needs `results/plant_model.keras` + `results/class_names.json` (both created
+by `train.py`).
+
 ## My results
 
-(Updated after each training run — see `results/` for plots.)
+Trained for 10 epochs on PlantVillage (43,443 training images, batch size 32,
+Adam optimizer, augmentation on):
+
+- Validation accuracy: **94.57%** (10,860 validation images)
+- Weighted precision: 0.95, recall: 0.95, F1-score: 0.95
+- Training curves: `results/history.png`
+- Confusion matrix: `results/confusion_matrix.png`
+
+Note: an early evaluation script measured 97.40% on a skewed validation
+subset (only 23 of 38 classes) — that figure was caught and discarded. The
+94.57% above is verified by two independent evaluations on the full random
+validation split. The trained model file (`results/plant_model.keras`) is not
+committed to GitHub (97 MB); it is included in the project ZIP, and
+`train.py` recreates it.
 
 ## Next ideas
 
 - Try transfer learning (e.g. MobileNetV2) and compare accuracy.
 - Test the model on real photos taken with a phone, not lab photos.
-- Build a simple app: take a photo → get the disease + treatment advice.
+- Add treatment advice for each predicted disease.
