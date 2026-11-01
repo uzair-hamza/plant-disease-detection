@@ -6,6 +6,8 @@ and tells which disease it has — or that the leaf is healthy.
 Built by **Muhammad Uzair Hamza** — BSc Computer Systems Engineering student, UET Peshawar.
 Project #12 in my machine learning series (after the CIFAR-10 Image Classifier).
 
+**Live demo:** try the model in your browser — upload a leaf photo and get an instant prediction: https://uzairhamza-leaf-disease-detector.streamlit.app/
+
 ## Dataset
 
 **PlantVillage** — ~54,306 leaf photos across 14 crops.
